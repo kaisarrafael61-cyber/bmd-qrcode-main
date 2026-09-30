@@ -34,6 +34,7 @@
                 <nav class="space-y-2">
                     <a href="{{ route('dashboard') }}" class="block rounded-2xl px-4 py-3 lg:py-2.5 {{ request()->routeIs('dashboard') ? 'bg-cyan-400 text-slate-950' : 'bg-slate-900 text-slate-100 hover:bg-slate-800' }}">Dashboard</a>
                     <a href="{{ route('assets.index') }}" class="block rounded-2xl px-4 py-3 lg:py-2.5 {{ request()->routeIs('assets.*') ? 'bg-cyan-400 text-slate-950' : 'bg-slate-900 text-slate-100 hover:bg-slate-800' }}">Data Aset</a>
+                    <a href="{{ route('kir.index') }}" class="block rounded-2xl px-4 py-3 lg:py-2.5 {{ request()->routeIs('kir.*') ? 'bg-cyan-400 text-slate-950' : 'bg-slate-900 text-slate-100 hover:bg-slate-800' }}">Dokumen KIR</a>
                     <a href="{{ route('exports.history') }}" class="block rounded-2xl px-4 py-3 lg:py-2.5 {{ request()->routeIs('exports.history') ? 'bg-cyan-400 text-slate-950' : 'bg-slate-900 text-slate-100 hover:bg-slate-800' }}">Riwayat Export</a>
                 </nav>
             </div>
@@ -53,8 +54,8 @@
                 <div class="min-w-0 flex items-center gap-3">
                     @include('partials.kominfo-logo', ['size' => 'h-12 w-12', 'alt' => 'Logo Kominfo', 'class' => 'rounded-full bg-white p-1'])
                     <div class="min-w-0">
-                    <p class="text-[10px] uppercase tracking-[0.24em] text-cyan-700">DINAS KOMINFO</p>
-                    <p class="mt-1 text-base font-semibold text-slate-950">BMD QR Asset</p>
+                        <p class="text-[10px] uppercase tracking-[0.24em] text-cyan-700">DINAS KOMINFO</p>
+                        <p class="mt-1 text-base font-semibold text-slate-950">BMD QR Asset</p>
                     </div>
                 </div>
                 <button type="button" id="open-mobile-sidebar" class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white" aria-label="Buka menu" aria-expanded="false">

@@ -107,9 +107,48 @@ class AssetController extends Controller
         return view('assets.public-show', compact('asset'));
     }
 
-    public function publicLookup(Asset $asset)
+    public function publicLookup($asset)
     {
-        return $this->assetLookupResponse($asset);
+        // 1. Jika parameter berupa model Asset yang terikat route model binding
+        if ($asset instanceof Asset) {
+            return $this->assetLookupResponse($asset);
+        }
+
+        $rawInput = trim((string) $asset);
+
+        // 2. Ekstraksi kunci jika scanner mengirimkan URL lengkap (misal: Ngrok, Localhost, atau Domain Publik)
+        if (filter_var($rawInput, FILTER_VALIDATE_URL) || str_contains($rawInput, 'http')) {
+            $path = parse_url($rawInput, PHP_URL_PATH);
+            $segments = array_filter(explode('/', rtrim((string) $path, '/')));
+            $assetKey = urldecode(end($segments));
+        } else {
+            $assetKey = urldecode($rawInput);
+        }
+
+        // 3. Pencarian Fleksibel bertahap di Database MySQL
+        // Tahap A: Cari exact match ID, asset_code, atau register_number
+        $foundAsset = Asset::where('id', $assetKey)
+            ->orWhere('asset_code', $assetKey)
+            ->orWhere('register_number', $assetKey)
+            ->first();
+
+        // Tahap B: Jika tidak ketemu, cari berdasar nama barang atau pencarian parsial
+        if (!$foundAsset) {
+            $foundAsset = Asset::where('name', 'like', '%'.$assetKey.'%')
+                ->orWhere('asset_code', 'like', '%'.$assetKey.'%')
+                ->oldest('id')
+                ->first();
+        }
+
+        // 4. Response error 404 jika benar-benar tidak ada di database
+        if (!$foundAsset) {
+            return response()->json([
+                'message' => 'Data aset tidak ditemukan.',
+                'searched_key' => $assetKey,
+            ], 404);
+        }
+
+        return $this->assetLookupResponse($foundAsset);
     }
 
     public function publicLookupByAssetCode(string $assetCode): JsonResponse
@@ -124,19 +163,20 @@ class AssetController extends Controller
         $photoUrl = $asset->photo_path ? url('storage/'.$asset->photo_path) : null;
 
         return response()->json([
-            'asset_code' => $asset->asset_code,
-            'register_number' => $asset->register_number,
-            'name' => $asset->name,
-            'category' => $asset->category,
-            'brand' => $asset->brand,
-            'year_acquired' => $asset->year_acquired,
-            'location' => $asset->location,
-            'person_in_charge' => $asset->person_in_charge,
-            'is_in_use' => $asset->is_in_use,
-            'condition' => $asset->condition,
-            'description' => $asset->description,
-            'photo_url' => $photoUrl,
-            'detail_url' => route('assets.public.show', $asset),
+            'id'               => $asset->id,
+            'asset_code'       => $asset->asset_code ?? '-',
+            'register_number'  => $asset->register_number ?? '-',
+            'name'             => $asset->name ?? '-',
+            'category'         => $asset->category ?? '-',
+            'brand'            => $asset->brand ?? '-',
+            'year_acquired'    => $asset->year_acquired ?? '-',
+            'location'         => is_object($asset->location) ? $asset->location->name : ($asset->location ?? '-'),
+            'person_in_charge' => $asset->person_in_charge ?? '-',
+            'is_in_use'        => $asset->is_in_use ?? true,
+            'condition'        => $asset->condition ? ucfirst($asset->condition) : '-',
+            'description'      => $asset->description ?? '-',
+            'photo_url'        => $photoUrl,
+            'detail_url'       => route('assets.public.show', $asset),
         ]);
     }
 
