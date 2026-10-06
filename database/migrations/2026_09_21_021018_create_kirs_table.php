@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('tahun_pembuatan')->nullable();
             $table->string('no_kode_barang')->nullable();
             $table->string('jumlah_register')->nullable();
+            $table->string('cara_perolehan')->nullable(); // Ditambahkan agar tidak error SQLSTATE[42S22]
             $table->string('keadaan_barang')->nullable(); // Baik, Kurang Baik, atau Rusak Berat
             $table->text('keterangan')->nullable();
             $table->timestamps();

@@ -14,30 +14,32 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class KirImport implements ToModel, WithStartRow
 {
     /**
-     * Mulai membaca data dari baris ke-10 (mengabaikan header judul)
+     * Mulai membaca data dari baris ke-13 (di bawah header tabel Excel)
      */
     public function startRow(): int
     {
-        return 10;
+        return 13;
     }
 
     public function model(array $row): ?Model
     {
-        // Abaikan jika kolom nama barang (indeks 2) kosong
-        if (empty($row[2])) {
+        // Abaikan jika nama barang (Kolom B / Index 1) kosong
+        if (empty($row[1])) {
             return null;
         }
 
-        $jenisBarang    = trim($row[2]);               // Kolom C
-        $merkModel      = trim($row[8] ?? '');         // Kolom I
-        $noSeri         = trim($row[10] ?? '');        // Kolom K
-        $ukuran         = trim($row[11] ?? '');        // Kolom L
-        $bahan          = trim($row[12] ?? '');        // Kolom M
-        $tahunPembuatan = trim($row[14] ?? '');        // Kolom O
-        $kodeBarang     = trim($row[15] ?? '');        // Kolom P
-        $jumlahRegister = trim($row[17] ?? '');        // Kolom R
-        $rawKondisi     = strtolower(trim($row[20] ?? 'baik')); // Kolom U
-        $keterangan     = trim($row[24] ?? '');        // Kolom Y
+        // Pemetaan Kolom Excel yang Akurat
+        $jenisBarang     = trim($row[1] ?? '');  // Kolom B
+        $merkModel       = trim($row[2] ?? '');  // Kolom C
+        $noSeri          = trim($row[3] ?? '');  // Kolom D
+        $ukuran          = trim($row[4] ?? '');  // Kolom E
+        $bahan           = trim($row[5] ?? '');  // Kolom F
+        $tahunPembuatan  = trim($row[6] ?? '');  // Kolom G
+        $kodeBarang      = trim($row[7] ?? '');  // Kolom H
+        $jumlahRegister  = trim($row[8] ?? '');  // Kolom I
+        $caraPerolehan   = trim($row[9] ?? '');  // Kolom J
+        $rawKondisi      = strtolower(trim($row[10] ?? 'baik')); // Kolom K
+        $keterangan      = trim($row[14] ?? ''); // Kolom O
 
         // Normalisasi kondisi untuk status dashboard ('baik' atau 'rusak')
         $kondisiNormalized = 'baik';
@@ -45,7 +47,7 @@ class KirImport implements ToModel, WithStartRow
             $kondisiNormalized = 'rusak';
         }
 
-        // 1. Simpan ke Tabel KIR (Untuk Laporan PDF Dokumentasi Ruangan)
+        // 1. Simpan ke Tabel KIR
         $kir = Kir::create([
             'ruangan'          => 'Sekretariat',
             'jenis_barang'     => $jenisBarang,
@@ -56,11 +58,12 @@ class KirImport implements ToModel, WithStartRow
             'tahun_pembuatan'  => $tahunPembuatan ?: null,
             'no_kode_barang'   => $kodeBarang ?: null,
             'jumlah_register'  => $jumlahRegister ?: null,
+            'cara_perolehan'   => $caraPerolehan ?: null,
             'keadaan_barang'   => ucfirst($kondisiNormalized),
             'keterangan'       => $keterangan ?: null,
         ]);
 
-        // 2. Otomatis Masuk ke Tabel Assets (Biar Muncul di Data Aset & Dashboard)
+        // 2. Otomatis Masuk ke Tabel Assets
         $asset = Asset::create([
             'asset_code'       => $kodeBarang ?: 'KODE-'.uniqid(),
             'register_number'  => $jumlahRegister ?: '-',
