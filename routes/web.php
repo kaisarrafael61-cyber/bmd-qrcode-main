@@ -38,7 +38,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Route Manajemen Aset
     Route::get('/assets/selection', [AssetController::class, 'selection'])->name('assets.selection');
+    
+    // Route Export Massal Word (Diberikan Alias Supaya Form Modal Tidak Error 405)
     Route::post('/assets/export/word', [AssetController::class, 'bulkExportWord'])->name('assets.export.word.bulk');
+    Route::post('/assets/export-word-bulk', [AssetController::class, 'bulkExportWord'])->name('assets.export.bulk');
+    
     Route::get('/assets/{asset}/export-word', [AssetController::class, 'exportWord'])->name('assets.export.word');
     Route::get('/assets/{asset}/download', [AssetController::class, 'download'])->name('assets.download');
     Route::resource('assets', AssetController::class)->parameters(['assets' => 'asset']);

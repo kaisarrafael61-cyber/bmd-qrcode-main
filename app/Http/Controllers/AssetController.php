@@ -274,12 +274,22 @@ class AssetController extends Controller
         return $this->downloadWordDocument($asset, $filename);
     }
 
-    public function bulkExportWord(BulkPrintAssetRequest $request)
+    public function bulkExportWord(Request $request)
     {
-        $selectedIds = collect($request->validated('asset_ids'))->map(fn ($id) => (int) $id)->values();
+        $this->ensureAdmin();
+
+        $rawAssetIds = $request->input('asset_ids', []);
+        
+        if (empty($rawAssetIds)) {
+            return back()->with('error', 'Pilih minimal satu aset untuk diexport.');
+        }
+
+        $selectedIds = collect($rawAssetIds)->map(fn ($id) => (int) $id)->values();
         $assets = Asset::whereIn('id', $selectedIds)->get()->sortBy(fn ($asset) => $selectedIds->search($asset->id))->values();
 
-        abort_if($assets->isEmpty(), 422, 'Aset yang dipilih untuk export tidak ditemukan.');
+        if ($assets->isEmpty()) {
+            return back()->with('error', 'Aset yang dipilih tidak ditemukan.');
+        }
 
         Asset::whereIn('id', $selectedIds)->update([
             'last_printed_at' => now(),
