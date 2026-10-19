@@ -4,7 +4,7 @@
   <!-- Chart.js untuk grafik kondisi aset -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
-  <!-- STYLE NATIVE KHUSUS DASHBOARD SAMA PERSIS DENGAN KODINGAN DESAIN -->
+  <!-- STYLE NATIVE KHUSUS DASHBOARD (FIT TO SCREEN / NO OUTER SCROLL) -->
   <style>
     :root {
       --navy: #031126;
@@ -21,75 +21,75 @@
       --gray-soft: #edf3f8;
       --text: #13243e;
       --muted: #71829a;
-      --radius: 16px;
-      --shadow: 0 8px 26px rgba(24, 55, 88, 0.07);
+      --radius: 14px;
+      --shadow: 0 4px 20px rgba(24, 55, 88, 0.05);
     }
 
     .topbar {
-      min-height: 58px;
+      min-height: 42px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 18px;
+      gap: 15px;
+      margin-bottom: 12px;
     }
 
     .page-kicker {
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       color: var(--cyan-dark);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.5px;
     }
 
     .page-title {
       margin: 0;
-      font-size: 30px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.8px;
-      line-height: 1.05;
+      line-height: 1.1;
       color: var(--text);
     }
 
     .page-subtitle {
-      margin: 4px 0 0;
+      margin: 2px 0 0;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .top-meta {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding-top: 4px;
+      gap: 12px;
+      padding-top: 2px;
       color: #657993;
       font-size: 10px;
       white-space: nowrap;
     }
 
     .top-meta-item {
-      padding-right: 15px;
+      padding-right: 12px;
       border-right: 1px solid #dce6ef;
     }
 
     .profile {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       color: var(--text);
       font-size: 11px;
       font-weight: 750;
     }
 
     .profile-avatar {
-      width: 31px;
-      height: 31px;
+      width: 27px;
+      height: 27px;
       display: grid;
       place-items: center;
       border-radius: 50%;
       color: #fff;
       background: var(--navy);
-      font-size: 13px;
+      font-size: 11px;
     }
 
     .card {
@@ -102,25 +102,25 @@
     .statistics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 17px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .stat-card {
-      min-height: 147px;
+      min-height: 100px;
       display: flex;
-      gap: 14px;
-      padding: 18px 20px;
+      gap: 12px;
+      padding: 14px 16px;
     }
 
     .stat-icon {
-      width: 47px;
-      height: 47px;
-      flex: 0 0 47px;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 800;
     }
 
@@ -129,40 +129,42 @@
     .stat-icon.red { color: #ed4057; background: #ffe7eb; }
     .stat-icon.cyan { color: #158ed5; background: #e4f5ff; }
 
-    .stat-label { margin: 4px 0 5px; color: #51657f; font-size: 12px; }
-    .stat-value { font-size: 30px; font-weight: 800; line-height: 1; color: var(--text); }
-    .stat-trend { margin-top: 9px; font-size: 11px; font-weight: 800; }
-    .stat-trend span { display: block; margin-top: 3px; color: #8090a4; font-weight: 500; }
+    .stat-label { margin: 2px 0 3px; color: #51657f; font-size: 11px; }
+    .stat-value { font-size: 24px; font-weight: 800; line-height: 1; color: var(--text); }
+    .stat-trend { margin-top: 6px; font-size: 10px; font-weight: 800; }
+    .stat-trend span { display: inline; margin-left: 4px; color: #8090a4; font-weight: 500; }
     .trend-up { color: #12aa6f; }
     .trend-down { color: #ed4057; }
     .trend-flat { color: #158ed5; }
 
     .dashboard-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-      gap: 15px;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+      gap: 12px;
     }
 
     .chart-card, .activity-card {
-      min-height: 477px;
-      padding: 21px 22px 17px;
+      padding: 16px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 240px); /* Kunci tinggi card proporsional dengan layar */
+      min-height: 380px;
     }
 
-    .section-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--text); }
+    .section-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--text); }
 
     .chart-area {
-      height: 250px;
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 30px;
-      margin-top: 5px;
+      gap: 20px;
     }
 
     .chart-wrapper {
       position: relative;
-      width: 235px;
-      height: 235px;
-      flex: 0 0 235px;
+      width: 170px;
+      height: 170px;
+      flex: 0 0 170px;
     }
 
     .chart-center {
@@ -174,28 +176,28 @@
       pointer-events: none;
     }
 
-    .chart-total { color: var(--text); font-size: 29px; font-weight: 800; line-height: 1; }
-    .chart-caption { margin-top: 4px; color: #61738c; font-size: 11px; }
+    .chart-total { color: var(--text); font-size: 22px; font-weight: 800; line-height: 1; }
+    .chart-caption { margin-top: 2px; color: #61738c; font-size: 10px; }
 
-    .chart-legend { display: grid; gap: 15px; flex: 1; }
+    .chart-legend { display: grid; gap: 8px; flex: 1; }
     .legend-row {
       display: grid;
-      grid-template-columns: 11px 1fr auto auto;
+      grid-template-columns: 9px 1fr auto auto;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
       color: #53667f;
       font-size: 11px;
     }
 
-    .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .legend-value { min-width: 30px; color: #172b47; font-weight: 800; text-align: right; }
-    .legend-percent { min-width: 29px; color: #72859e; text-align: right; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .legend-value { min-width: 25px; color: #172b47; font-weight: 800; text-align: right; }
+    .legend-percent { min-width: 25px; color: #72859e; text-align: right; }
 
-    .condition-summary { margin-top: 13px; }
-    .condition-title { margin-bottom: 11px; color: #1c2e47; font-size: 12px; font-weight: 800; }
+    .condition-summary { margin-top: 10px; border-top: 1px solid #edf1f5; padding-top: 10px; }
+    .condition-title { margin-bottom: 6px; color: #1c2e47; font-size: 11px; font-weight: 800; }
     .condition-bar {
       width: 100%;
-      height: 15px;
+      height: 10px;
       display: flex;
       overflow: hidden;
       border-radius: 99px;
@@ -206,21 +208,21 @@
     .condition-values {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      margin-top: 12px;
+      margin-top: 8px;
     }
 
-    .condition-item { min-height: 62px; padding: 0 14px; border-right: 1px solid #edf1f5; }
+    .condition-item { padding: 0 8px; border-right: 1px solid #edf1f5; }
     .condition-item:first-child { padding-left: 0; }
     .condition-item:last-child { padding-right: 0; border-right: 0; }
-    .condition-label { display: flex; align-items: center; gap: 8px; color: #50647e; font-size: 11px; }
-    .condition-number { margin-top: 8px; color: #1b2d46; font-size: 14px; font-weight: 800; }
-    .condition-percent { margin-top: 4px; color: #8291a5; font-size: 10px; }
+    .condition-label { display: flex; align-items: center; gap: 6px; color: #50647e; font-size: 10px; }
+    .condition-number { margin-top: 2px; color: #1b2d46; font-size: 12px; font-weight: 800; }
+    .condition-percent { color: #8291a5; font-size: 9px; }
 
     .activity-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
     .see-all {
@@ -233,24 +235,31 @@
       text-decoration: none;
     }
 
-    .activity-list { display: grid; }
+    .activity-list { 
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto; /* Scroll internal khusus card aktivitas jika log menumpuk */
+      padding-right: 4px;
+    }
+
     .activity-item {
-      min-height: 86px;
       display: grid;
-      grid-template-columns: 43px 1fr auto auto;
+      grid-template-columns: 34px 1fr auto auto;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
+      padding: 8px 0;
       border-bottom: 1px solid #edf1f5;
     }
     .activity-item:last-child { border-bottom: 0; }
 
     .activity-icon {
-      width: 39px;
-      height: 39px;
+      width: 32px;
+      height: 32px;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 800;
     }
     .activity-icon.green { color: #12a96e; background: var(--green-soft); }
@@ -258,13 +267,12 @@
     .activity-icon.orange { color: #ee9d15; background: var(--orange-soft); }
     .activity-icon.red { color: #ef4058; background: var(--red-soft); }
 
-    .activity-title { color: #354964; font-size: 11px; font-weight: 800; }
-    .activity-subtitle { margin-top: 5px; color: #7b8ca2; font-size: 10px; }
+    .activity-title { color: #354964; font-size: 11px; font-weight: 800; line-height: 1.2; }
+    .activity-subtitle { margin-top: 2px; color: #7b8ca2; font-size: 9px; }
     .activity-time { color: #7e8ea3; font-size: 9px; white-space: nowrap; }
 
     .activity-tag {
-      min-width: 57px;
-      padding: 5px 8px;
+      padding: 3px 6px;
       border-radius: 20px;
       font-size: 9px;
       font-weight: 800;
@@ -278,15 +286,7 @@
     @media (max-width: 1120px) {
       .statistics { grid-template-columns: repeat(2, 1fr); }
       .dashboard-grid { grid-template-columns: 1fr; }
-      .chart-card, .activity-card { min-height: auto; }
-    }
-    @media (max-width: 620px) {
-      .statistics { grid-template-columns: 1fr; }
-      .chart-area { height: auto; flex-direction: column; gap: 24px; padding-top: 8px; }
-      .chart-wrapper { width: 210px; height: 210px; flex-basis: 210px; }
-      .chart-legend { width: 100%; }
-      .condition-values { grid-template-columns: repeat(2, 1fr); gap: 15px 0; }
-      .activity-item { grid-template-columns: 40px 1fr auto; gap: 9px; }
+      .chart-card, .activity-card { height: auto; min-height: auto; }
     }
   </style>
 
@@ -327,8 +327,7 @@
         <div class="stat-label">Total Aset</div>
         <div class="stat-value">{{ $summary['total'] }}</div>
         <div class="stat-trend trend-up">
-          ↑ 12%
-          <span>dibanding bulan lalu</span>
+          ↑ 12% <span>dibanding bulan lalu</span>
         </div>
       </div>
     </article>
@@ -339,8 +338,7 @@
         <div class="stat-label">Aset Kondisi Baik</div>
         <div class="stat-value">{{ $summary['baik'] }}</div>
         <div class="stat-trend trend-up">
-          ↑ 13%
-          <span>dibanding bulan lalu</span>
+          ↑ 13% <span>dibanding bulan lalu</span>
         </div>
       </div>
     </article>
@@ -351,8 +349,7 @@
         <div class="stat-label">Aset Rusak</div>
         <div class="stat-value">{{ $summary['rusak'] }}</div>
         <div class="stat-trend trend-down">
-          ↓ 8%
-          <span>dibanding bulan lalu</span>
+          ↓ 8% <span>dibanding bulan lalu</span>
         </div>
       </div>
     </article>
@@ -363,8 +360,7 @@
         <div class="stat-label">Jumlah Lokasi Aset</div>
         <div class="stat-value">{{ $summary['lokasi'] }}</div>
         <div class="stat-trend trend-flat">
-          ↑ 0%
-          <span>dibanding bulan lalu</span>
+          ↑ 0% <span>dibanding bulan lalu</span>
         </div>
       </div>
     </article>
@@ -431,38 +427,30 @@
         <div class="condition-values">
           <div class="condition-item">
             <div class="condition-label">
-              <span class="legend-dot" style="background:#18b77a"></span>
-              Baik
+              <span class="legend-dot" style="background:#18b77a"></span> Baik
             </div>
-            <div class="condition-number">{{ $summary['baik'] }}</div>
-            <div class="condition-percent">{{ $pctBaik }}%</div>
+            <div class="condition-number">{{ $summary['baik'] }} <span class="condition-percent">({{ $pctBaik }}%)</span></div>
           </div>
 
           <div class="condition-item">
             <div class="condition-label">
-              <span class="legend-dot" style="background:#f04458"></span>
-              Rusak
+              <span class="legend-dot" style="background:#f04458"></span> Rusak
             </div>
-            <div class="condition-number">{{ $summary['rusak'] }}</div>
-            <div class="condition-percent">{{ $pctRusak }}%</div>
+            <div class="condition-number">{{ $summary['rusak'] }} <span class="condition-percent">({{ $pctRusak }}%)</span></div>
           </div>
 
           <div class="condition-item">
             <div class="condition-label">
-              <span class="legend-dot" style="background:#f5aa27"></span>
-              Dalam Perbaikan
+              <span class="legend-dot" style="background:#f5aa27"></span> Perbaikan
             </div>
-            <div class="condition-number">0</div>
-            <div class="condition-percent">0%</div>
+            <div class="condition-number">0 <span class="condition-percent">(0%)</span></div>
           </div>
 
           <div class="condition-item">
             <div class="condition-label">
-              <span class="legend-dot" style="background:#9bb0c9"></span>
-              Hilang
+              <span class="legend-dot" style="background:#9bb0c9"></span> Hilang
             </div>
-            <div class="condition-number">0</div>
-            <div class="condition-percent">0%</div>
+            <div class="condition-number">0 <span class="condition-percent">(0%)</span></div>
           </div>
         </div>
       </div>
@@ -510,7 +498,7 @@
             <div>
               <div class="activity-title">{{ $activity->description }}</div>
               <div class="activity-subtitle">
-                {{ $activity->user?->name ?? 'Admin' }} - {{ $activity->created_at->format('d M Y H:i') }}
+                {{ $activity->user?->name ?? 'Admin' }} — {{ $activity->created_at->format('d M Y H:i') }}
               </div>
             </div>
 
@@ -523,7 +511,7 @@
             </div>
           </div>
         @empty
-          <div style="padding: 30px 0; text-align: center; color: #8291a5; font-size: 12px;">
+          <div style="padding: 40px 0; text-align: center; color: #8291a5; font-size: 11px;">
             Belum ada aktivitas tercatat.
           </div>
         @endforelse
@@ -552,7 +540,7 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: "68%",
+            cutout: "70%",
             plugins: {
               legend: { display: false }
             }

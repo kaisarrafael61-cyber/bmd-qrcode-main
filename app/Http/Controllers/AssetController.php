@@ -25,11 +25,42 @@ use ZipArchive;
 
 class AssetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('assets.index', [
-            'assets' => Asset::latest()->paginate(10),
-        ]);
+        $query = Asset::latest();
+
+        // 1. Tangkap dan proses filter pencarian teks (Nama, Kode, Lokasi, Kategori)
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('asset_code', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Filter Kategori
+        if ($category = $request->input('category')) {
+            $query->where('category', $category);
+        }
+
+        // 3. Filter Kondisi
+        if ($condition = $request->input('condition')) {
+            $query->where('condition', $condition);
+        }
+
+        // 4. Filter Tanggal
+        if ($date = $request->input('date')) {
+            $query->whereDate('created_at', $date);
+        }
+
+        // Ambil data dengan pagination dan pertahankan query string URL saat pindah halaman
+        $assets = $query->paginate(10)->withQueryString();
+
+        // Ambil daftar kategori unik untuk dropdown pilihan di view
+        $categories = Asset::distinct()->whereNotNull('category')->pluck('category');
+
+        return view('assets.index', compact('assets', 'categories'));
     }
 
     public function create()

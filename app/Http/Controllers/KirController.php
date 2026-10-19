@@ -18,19 +18,46 @@ class KirController extends Controller
     // FITUR: Upload & Tampil Manual PDF KIR
     // -------------------------------------------------------------
 
-    // Menampilkan halaman daftar & form upload
-    public function index()
+    // Menampilkan halaman daftar, form upload, pencarian, dan filter tabel KIR
+    public function index(Request $request)
     {
         $kirList = KirPdf::latest()->get();
 
-        // Mengambil data KIR dengan aman (mencegah error jika tabel kirs belum ada)
+        // Mengambil data KIR dengan filter pencarian, tahun, bahan, dan pagination
         try {
-            $kirs = Kir::all();
+            $query = Kir::query();
+
+            // 1. Filter Pencarian Teks
+            if ($search = $request->input('search')) {
+                $query->where(function($q) use ($search) {
+                    $q->where('jenis_barang', 'like', "%{$search}%")
+                      ->orWhere('no_kode_barang', 'like', "%{$search}%")
+                      ->orWhere('merk_model', 'like', "%{$search}%");
+                });
+            }
+
+            // 2. Filter Tahun Pembuatan
+            if ($year = $request->input('year')) {
+                $query->where('tahun_pembuatan', $year);
+            }
+
+            // 3. Filter Bahan
+            if ($material = $request->input('material')) {
+                $query->where('bahan', $material);
+            }
+
+            // Eksekusi paginasi 10 data per halaman dengan mempertahankan query string URL
+            $kirs = $query->paginate(10)->withQueryString();
+
+            // Ambil daftar bahan unik untuk pilihan dropdown di view
+            $materials = Kir::distinct()->whereNotNull('bahan')->pluck('bahan');
+
         } catch (Throwable $e) {
-            $kirs = collect(); // Mengembalikan koleksi kosong jika tabel kirs belum ada
+            $kirs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10); // Kosong aman jika tabel belum ada
+            $materials = collect();
         }
         
-        return view('kir.index', compact('kirList', 'kirs'));
+        return view('kir.index', compact('kirList', 'kirs', 'materials'));
     }
 
     // Memproses upload file PDF KIR secara manual
@@ -92,7 +119,7 @@ class KirController extends Controller
 
         Excel::import(new KirImport, $request->file('file'));
 
-        return redirect()->back()->with('success', 'Data Excel KIR berhasil di-import!');
+        return redirect()->route('kir.index')->with('success', 'Data Excel KIR berhasil di-import!');
     }
 
     // Stream/Pratinjau PDF di browser (bisa berdasarkan ruangan atau cetak semua)
