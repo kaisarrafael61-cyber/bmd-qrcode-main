@@ -29,22 +29,37 @@ class KirImport implements ToModel, WithStartRow
         }
 
         // Pemetaan Kolom Excel yang Akurat
-        $jenisBarang     = trim($row[1] ?? '');  // Kolom B
-        $merkModel       = trim($row[2] ?? '');  // Kolom C
-        $noSeri          = trim($row[3] ?? '');  // Kolom D
-        $ukuran          = trim($row[4] ?? '');  // Kolom E
-        $bahan           = trim($row[5] ?? '');  // Kolom F
-        $tahunPembuatan  = trim($row[6] ?? '');  // Kolom G
-        $kodeBarang      = trim($row[7] ?? '');  // Kolom H
-        $jumlahRegister  = trim($row[8] ?? '');  // Kolom I
-        $caraPerolehan   = trim($row[9] ?? '');  // Kolom J
-        $rawKondisi      = strtolower(trim($row[10] ?? 'baik')); // Kolom K
-        $keterangan      = trim($row[14] ?? ''); // Kolom O
+        $jenisBarang     = trim($row[1] ?? '');  // Kolom B (Jenis Barang)
+        $merkModel       = trim($row[2] ?? '');  // Kolom C (Merk/Model)
+        $noSeri          = trim($row[3] ?? '');  // Kolom D (No Seri Pabrik)
+        $ukuran          = trim($row[4] ?? '');  // Kolom E (Ukuran)
+        $bahan           = trim($row[5] ?? '');  // Kolom F (Bahan)
+        $tahunPembuatan  = trim($row[6] ?? '');  // Kolom G (Tahun Pembuatan)
+        $kodeBarang      = trim($row[7] ?? '');  // Kolom H (No Kode Barang)
+        $jumlahRegister  = trim($row[8] ?? '');  // Kolom I (Jumlah/Register)
+        $caraPerolehan   = trim($row[9] ?? '');  // Kolom J (Asal/Cara Perolehan)
+        
+        // Membaca 3 sub-kolom Keadaan Barang di Excel (Baik, Kurang Baik, Rusak Berat)
+        $rawBaik         = trim($row[10] ?? ''); // Kolom K: Baik (B)
+        $rawKb           = trim($row[11] ?? ''); // Kolom L: Kurang Baik (KB)
+        $rawRb           = trim($row[12] ?? ''); // Kolom M: Rusak Berat (RB)
+        $keterangan      = trim($row[13] ?? ''); // Kolom N / Indeks 13 (Keterangan)
 
-        // Normalisasi kondisi untuk status dashboard ('baik' atau 'rusak')
+        // Deteksi Kondisi Secara Akurat dari 3 Kolom Keadaan Barang
         $kondisiNormalized = 'baik';
-        if (str_contains($rawKondisi, 'rusak') || str_contains($rawKondisi, 'rb') || str_contains($rawKondisi, 'kb')) {
+        $keadaanBarang     = 'Baik';
+
+        if (!empty($rawRb) || stripos($rawRb, 'rusak') !== false || stripos($rawRb, 'rb') !== false) {
             $kondisiNormalized = 'rusak';
+            $keadaanBarang     = $rawRb === '1 Rusak Berat' || $rawRb === 'Rusak Berat' ? $rawRb : 'Rusak Berat';
+        } elseif (!empty($rawKb) || stripos($rawKb, 'kurang') !== false || stripos($rawKb, 'kb') !== false) {
+            $kondisiNormalized = 'rusak';
+            $keadaanBarang     = $rawKb ?: 'Kurang Baik';
+        } elseif (!empty($rawBaik) && (stripos($rawBaik, 'rusak') !== false || stripos($rawBaik, 'rb') !== false || stripos($rawBaik, 'kb') !== false)) {
+            $kondisiNormalized = 'rusak';
+            $keadaanBarang     = $rawBaik;
+        } else {
+            $keadaanBarang     = $rawBaik ?: 'Baik';
         }
 
         // 1. Simpan ke Tabel KIR
@@ -59,7 +74,7 @@ class KirImport implements ToModel, WithStartRow
             'no_kode_barang'   => $kodeBarang ?: null,
             'jumlah_register'  => $jumlahRegister ?: null,
             'cara_perolehan'   => $caraPerolehan ?: null,
-            'keadaan_barang'   => ucfirst($kondisiNormalized),
+            'keadaan_barang'   => $keadaanBarang,
             'keterangan'       => $keterangan ?: null,
         ]);
 
