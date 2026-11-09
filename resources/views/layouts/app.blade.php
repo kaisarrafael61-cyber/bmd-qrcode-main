@@ -7,7 +7,7 @@
     <link rel="icon" type="image/jpeg" href="{{ asset('branding/logo-kominfo-kubar.jpeg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* Kunci total tinggi layar 100vh tanpa scrollbar browser luar */
+        /* Kunci total tinggi layar 100vh tanpa scrollbar browser luar khusus Desktop */
         html, body {
             height: 100vh;
             max-height: 100vh;
@@ -15,6 +15,23 @@
             padding: 0;
             overflow: hidden !important;
             background-color: #f1f5f9;
+        }
+
+        /* TAMPILAN HP / MOBILE: IZINKAN HALAMAN BISA DI-SCROLL KE BAWAH */
+        @media (max-width: 991px) {
+            html, body {
+                height: auto !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+            }
+            .flex.h-screen {
+                height: auto !important;
+                min-height: 100vh;
+            }
+            main {
+                height: auto !important;
+                overflow-y: visible !important;
+            }
         }
     </style>
 </head>
@@ -64,7 +81,7 @@
             </div>
         </aside>
 
-        <!-- Main Content (Tinggi Terkunci & Konten Dalam Bisa Scroll Internal) -->
+        <!-- Main Content (Tinggi Terkunci di Desktop & Auto di Mobile) -->
         <main class="flex h-screen min-w-0 flex-1 flex-col overflow-y-auto px-4 py-3 sm:px-6 sm:py-4 lg:px-6 lg:py-4">
             <div class="mb-3 flex items-center justify-between rounded-2xl bg-white px-4 py-2.5 shadow-sm lg:hidden">
                 <div class="min-w-0 flex items-center gap-3">
